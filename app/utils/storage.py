@@ -19,3 +19,5 @@ class RedisClient:
 
     def exists(self, key):
         return self.client.exists(key)
+
+redis_client = RedisClient(host='localhost', port=6379, db=0)
