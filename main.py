@@ -16,6 +16,11 @@ if __name__ == '__main__':
     TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
     app = ApplicationBuilder().token(TOKEN).build()
 
+    app.bot.set_my_commands([
+        ("newmatch", "Start a new match"),
+        ("status", "Check current participants"),
+    ])
+
     app.add_handler(CommandHandler("newmatch", new_match))
     app.add_handler(CommandHandler("status", status))
     app.add_handler(CallbackQueryHandler(handle_button))
