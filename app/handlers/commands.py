@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from utils.storage import redis_client
-from constants import REDIS_KEY
+from app.utils.storage import redis_client
+from app.constants import REDIS_KEY
 
 
 async def new_match(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -1,2 +1,2 @@
-MAX_CONFIRMED = 14
+MAX_CONFIRMED = 0
 REDIS_KEY = "cricket_rsvp_state"

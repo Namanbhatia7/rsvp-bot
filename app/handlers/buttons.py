@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..utils.storage import redis_client
-from ..constants import REDIS_KEY, MAX_CONFIRMED
+from app.utils.storage import redis_client
+from app.constants import REDIS_KEY, MAX_CONFIRMED
 
 async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
