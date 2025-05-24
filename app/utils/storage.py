@@ -1,3 +1,4 @@
+import os
 import redis
 import json
 
@@ -20,4 +21,9 @@ class RedisClient:
     def exists(self, key):
         return self.client.exists(key)
 
-redis_client = RedisClient(host='localhost', port=6379, db=0)
+redis_client = RedisClient(
+    host=os.getenv("REDIS_HOST", "localhost"), 
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    db=0,
+    decode_responses=True
+)
