@@ -1,4 +1,5 @@
 import os
+import ssl
 import redis
 import json
 
@@ -24,6 +25,8 @@ class RedisClient:
 redis_client = RedisClient(
     host=os.getenv("REDIS_HOST", "localhost"), 
     port=int(os.getenv("REDIS_PORT", 6379)),
+    password=os.getenv("REDIS_PASSWORD", None),
+    ssl=os.getenv("REDIS_SSL", False),
     db=0,
     decode_responses=True
 )
