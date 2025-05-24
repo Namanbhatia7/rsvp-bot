@@ -4,14 +4,14 @@ import redis
 import json
 
 class RedisClient:
-    def __init__(self, host='localhost', port=6379, password=None, ssl=False, db=0, decoded_responses=True):
+    def __init__(self, host='localhost', port=6379, password=None, ssl=False, db=0, decode_responses=True):
         self.client = redis.StrictRedis(
             host=host,
             port=port,
             password=password,
             ssl=ssl,
             db=db,
-            decode_responses=decoded_responses
+            decode_responses=decode_responses
         )
 
     def set(self, key, value):
