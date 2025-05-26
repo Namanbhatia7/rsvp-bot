@@ -9,35 +9,34 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     user_id = user.id
     name = user.full_name
+    choice = query.data
 
-    state = redis_client.get(REDIS_KEY) or {"confirmed": [], "waitlist": []}
+    state = redis_client.get(REDIS_KEY)
+    if not state:
+        await query.edit_message_text("No active poll.")
+        return
 
-    if query.data == 'join':
-        if any(uid == user_id for uid, _ in state['confirmed'] + state['waitlist']):
-            await query.edit_message_text("You've already responded.")
-            return
-        if len(state['confirmed']) < MAX_CONFIRMED:
+    # Remove user from all categories first
+    state['confirmed'] = [u for u in state['confirmed'] if u[0] != user_id]
+    state['waitlist'] = [u for u in state['waitlist'] if u[0] != user_id]
+    state['declined'] = [u for u in state['declined'] if u[0] != user_id]
+
+    if choice == 'yes':
+        if len(state['confirmed']) < state['limit']:
             state['confirmed'].append((user_id, name))
-            redis_client.set(REDIS_KEY, state)
-            await query.edit_message_text(f"You're in, {name}! ✅")
+            await query.edit_message_text(f"You're confirmed, {name}! ✅")
         else:
             state['waitlist'].append((user_id, name))
-            redis_client.set(REDIS_KEY, state)
-            await query.edit_message_text(f"Added to waitlist, {name}. ⏳")
+            await query.edit_message_text(f"You're added to waitlist, {name}. ⏳")
 
-    elif query.data == 'drop':
-        msg = ""
-        if (user_id, name) in state['confirmed']:
-            state['confirmed'].remove((user_id, name))
-            msg = f"You've been removed, {name}. 👋"
-            if state['waitlist']:
-                promoted = state['waitlist'].pop(0)
-                state['confirmed'].append(promoted)
-                await context.bot.send_message(promoted[0], "🎉 You're now confirmed for the match!")
-        elif (user_id, name) in state['waitlist']:
-            state['waitlist'].remove((user_id, name))
-            msg = f"Removed from waitlist, {name}."
-        else:
-            msg = "You weren't in the list."
-        redis_client.set(REDIS_KEY, state)
-        await query.edit_message_text(msg)
+    elif choice == 'no':
+        state['declined'].append((user_id, name))
+        await query.edit_message_text(f"You chose not to participate, {name}. ❌")
+
+        # Promote from waitlist
+        if len(state['confirmed']) < state['limit'] and state['waitlist']:
+            promoted = state['waitlist'].pop(0)
+            state['confirmed'].append(promoted)
+            await context.bot.send_message(promoted[0], f"🎉 You're now confirmed for: {state['description']}")
+    
+    redis_client.set(REDIS_KEY, state)
