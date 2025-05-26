@@ -1,16 +1,16 @@
 import logging
 import os
 from dotenv import load_dotenv
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ConversationHandler
 
-from app.handlers.commands import new_match, status
+
+from app.constants import CONFIRM_DESCRIPTION, CONFIRM_LIMIT
+from app.handlers.commands import confirm_description, handle_limit, new_match, start_poll, status
 from app.handlers.buttons import handle_button
 
-# Logging
 logging.basicConfig(level=logging.INFO)
 
 
-# Main
 if __name__ == '__main__':
     load_dotenv()
     TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -20,6 +20,19 @@ if __name__ == '__main__':
         ("newmatch", "Start a new match"),
         ("status", "Check current participants"),
     ])
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("startpoll", start_poll)],
+        states={
+            CONFIRM_DESCRIPTION: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, confirm_description)
+            ],
+            CONFIRM_LIMIT: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_limit)
+            ],
+        },
+        fallbacks=[]
+    )
 
     app.add_handler(CommandHandler("newmatch", new_match))
     app.add_handler(CommandHandler("status", status))
