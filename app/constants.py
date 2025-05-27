@@ -1,2 +1,3 @@
-MAX_CONFIRMED = 14
-REDIS_KEY = "cricket_rsvp_state"
+CONFIRM_DESCRIPTION = 0
+CONFIRM_LIMIT = 1
+REDIS_KEY = "match_poll_state"
