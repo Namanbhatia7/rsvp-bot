@@ -34,7 +34,7 @@ if __name__ == '__main__':
         fallbacks=[]
     )
 
-    app.add_handler(CommandHandler("newmatch", new_match))
+    app.add_handler(conv_handler)
     app.add_handler(CommandHandler("status", status))
     app.add_handler(CallbackQueryHandler(handle_button))
 
